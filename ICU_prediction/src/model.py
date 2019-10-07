@@ -10,11 +10,11 @@ import tensorflow as tf
 
 class Model(object):
   def __init__(self):
-    self.x_input = tf.placeholder(tf.float32, shape = [None, 8*5+4])
-    self.y_input = tf.placeholder(tf.int64, shape = [None])
+    self.x_input = tf.placeholder(tf.float32, shape=[None, 8 * 5 + 4])
+    self.y_input = tf.placeholder(tf.int64, shape=[None])
 
     # First fully connected layer.
-    W_fc1 = self._weight_variable([8*5+4, 256])
+    W_fc1 = self._weight_variable([8 * 5 + 4, 256])
     b_fc1 = self._bias_variable([256])
     
     h_fc1 = tf.nn.relu(tf.matmul(self.x_input, W_fc1) + b_fc1)
@@ -43,16 +43,16 @@ class Model(object):
 
   @staticmethod
   def _bias_variable(shape):
-      initial = tf.constant(0.1, shape = shape)
+      initial = tf.constant(0.1, shape=shape)
       return tf.Variable(initial)
 
   @staticmethod
   def _conv2d(x, W):
-      return tf.nn.conv2d(x, W, strides=[1,1,1,1], padding='SAME')
+      return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
 
   @staticmethod
   def _max_pool_2x2( x):
       return tf.nn.max_pool(x,
-                            ksize = [1,2,2,1],
-                            strides=[1,2,2,1],
+                            ksize = [1, 2, 2, 1],
+                            strides=[1, 2, 2, 1],
                             padding='SAME')
