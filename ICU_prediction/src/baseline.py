@@ -58,9 +58,9 @@ def main():
 	class_weight = {0: 1., 1: cw}
 	earlyStopping = EarlyStopping(monitor='val_loss', patience=3)
 	model.fit(x_train, y_train, validation_data = (x_valid, y_valid), 
-    epochs=50, batch_size=256, shuffle=0, 
-    class_weight=class_weight, 
-    callbacks=[earlyStopping])
+		  epochs=50, batch_size=256, shuffle=0, 
+		  class_weight=class_weight, 
+		  callbacks=[earlyStopping])
 
 	# Evaluation.
 	utils.evaluate(model, x_train, y_train)
