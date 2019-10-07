@@ -1,3 +1,6 @@
+"""To some basic analysis of the distribution of the data."""
+
+
 import numpy as np 
 from read_data import read_npy
 
@@ -5,12 +8,12 @@ from read_data import read_npy
 def preprocessing():
 	icu = read_npy('icu_8') 
 	noicu = read_npy('noicu_8') 
-	basicInf = np.concatenate([icu[:, :4], noicu[:, :4]], axis = 0)
+	basicInf = np.concatenate([icu[:, :4], noicu[:, :4]], axis=0)
 	basicInf = basicInf.astype(np.float64)
-	#basicInf = np.where(np.isnan(basicInf), 0, basicInf)
+	# basicInf = np.where(np.isnan(basicInf), 0, basicInf)
 
-	data_num = icu.shape[0]+noicu.shape[0]
-	whole = np.concatenate([icu[:, 4:9], noicu[:, 4:9]], axis = 0)
+	data_num = icu.shape[0] + noicu.shape[0]
+	whole = np.concatenate([icu[:, 4:9], noicu[:, 4:9]], axis=0)
 	
 	window_size = 64
 	history = np.zeros([data_num, 5, window_size])
@@ -21,7 +24,7 @@ def preprocessing():
 			else:
 				history[i][j] = np.copy(np.array(whole[i][j][-window_size:]))
 	history = np.transpose(history, [0, 2, 1])
-	#history = np.where(np.isnan(history), 0, history)
+	# history = np.where(np.isnan(history), 0, history)
 
 	return basicInf, history
 
@@ -29,17 +32,17 @@ def calculate_nan_ratio(arr):
 	if len(arr.shape) == 2:
 		for i in range(arr.shape[1]):
 			n = np.count_nonzero(np.isnan(arr[:, i]))
-			print(i, ', num =', n, n/float(arr.shape[0]))
+			print(i, ', num =', n, n / float(arr.shape[0]))
 	elif len(arr.shape) == 3:
 		print('dim 1')
 		for i in range(arr.shape[1]):
 			n = np.count_nonzero(np.isnan(arr[:, i]))
-			print '%.1f\t' %(100.0*n/float(arr.shape[0]*arr.shape[2])),
+			print '%.1f\t' %(100.0*n / float(arr.shape[0] * arr.shape[2])),
 			if i % 10 == 9: print ""
 		print('\ndim 2')
 		for i in range(arr.shape[2]):
 			n = np.count_nonzero(np.isnan(arr[:, :, i]))
-			print(i, 'num =', n, n/float(arr.shape[0]*arr.shape[1]))
+			print(i, 'num =', n, n / float(arr.shape[0] * arr.shape[1]))
 
 
 def main():
@@ -92,7 +95,6 @@ def main():
 	mean, median of group
 	ts prediction
 	'''
-
 
 
 if __name__ == '__main__':
