@@ -1,5 +1,4 @@
 import os 
-#import word2vec
 import numpy as np 
 from numpy.random import seed
 seed(17)
@@ -7,6 +6,7 @@ from gensim.models import Word2Vec
 #from test_fasttext import load_vectors
 #from sklearn.feature_extraction.text import CountVectorizer  
 #from sklearn.feature_extraction.text import TfidfTransformer  
+
 
 def get_doc(only_title = False, only_abstract = False, remove_stopwords = True):
 	# read all doc into lists
@@ -40,11 +40,13 @@ def get_doc(only_title = False, only_abstract = False, remove_stopwords = True):
 		if i % 5000 == 0: print(i)
 	return docs
 
+
 def get_stopwords():
 	f = open('stopwords.txt', 'r')
 	stop_words = []
 	for line in f: stop_words.append(line[:-1])
 	return stop_words
+
 
 def preprocess_doc(s, remove_stopwords):
 	s = ' '.join(s)
@@ -62,10 +64,12 @@ def preprocess_doc(s, remove_stopwords):
 	s = [stem(w) for w in s]
 	return s
 	
+	
 def stem(word): 
 	for suffix in ['ing', 'ly', 'ed', 'ious', 'ies', 'ive', 'es', 's', 'ment']:
 		if word.endswith(suffix): return word[:-len(suffix)]
 	return word
+
 
 def train_wordModel(doc, word_dim):
 	print('train word 2 vec model...')
@@ -75,6 +79,7 @@ def train_wordModel(doc, word_dim):
 		for word2 in ['quantum', 'quark', 'according', 'cat']:
 			print(word1, word2, wordModel.similarity(word1, word2))
 	return wordModel
+
 
 def wordEmbedding(doc, wordModel, word_dim):
 	print("Word Embedding")
@@ -101,6 +106,7 @@ def wordEmbedding(doc, wordModel, word_dim):
 	print('keyerror length =', keyerror_count)
 	return emb
 
+
 def embedding_fasttext(doc, data):
 	emb = np.zeros([len(doc), 300])
 	doc_length = np.zeros([len(doc)]) # for doc length normalization
@@ -125,6 +131,7 @@ def embedding_fasttext(doc, data):
 	print('keyerror length =', keyerror_count)
 	return emb
 
+
 def embedding_tfidf(doc):
 	vectorizer = TfidfTransformer()  
 	X = vectorizer.fit_transform(doc)  
@@ -135,6 +142,7 @@ def embedding_tfidf(doc):
 	exit()
 	return X
 
+
 def save(emb):
 	np.save('data/emb_word2vec_300.npy', emb)
 	#np.save('data/doc_length_1008.npy', doc_length)
@@ -142,6 +150,7 @@ def save(emb):
 	#return emb, doc_length
 
 stop_words = get_stopwords()
+
 
 def word2vec():
 	#doc = get_doc(remove_stopwords = False)
@@ -166,6 +175,7 @@ def word2vec():
 	'''
 	save(emb)
 
+	
 def fasttext():
 	title = get_doc(only_title = True)
 	abstract = get_doc(only_abstract = True)
@@ -178,18 +188,19 @@ def fasttext():
 	print('emb =', emb1.shape, emb2.shape)
 	emb = np.concatenate([emb1, emb2], axis = 1)
 	save(emb)
+	
+	
 def tfidf():
 	doc = get_doc()
 	emb = embedding_tfidf(doc)
 	save(emb)
 
+	
 def main():
 	word2vec()
 	
 
 if __name__ == '__main__':
 	main()
-
-
 
 	
