@@ -1,31 +1,31 @@
-# guess the highest one (for task1 and task2)
+"""Guess the most common one (for task1 and task2)."""
+
 import numpy as np 
 import pickle 
 import read_data
+
 from scipy.spatial.distance import cosine, euclidean
 
-def get_eaten(): # for task 1
-	a = 3
+
 
 def output_task1(rank_array, eaten_array):
 	# rank_array[user] = [2, 4, 3], prediction for each food
 	# eaten_array[user] = [1, 3, 3], history count for each food for this user
 	pred = np.empty([user_num, 20])
 	for i in range(user_num):
-		if i < 3: print('rank =', rank_array[i][:20])
 		for j in range(food_num):
-			if eaten_array[i][j] != 0: rank_array[i][j] = 0
+			if eaten_array[i][j] != 0: 
+				rank_array[i][j] = 0
 		rank_array[i] = -rank_array[i]
 		rank_argsort = np.argsort(rank_array[i])[:20]
 		rank_sort = np.sort(rank_array[i])[:20]
 		pred[i] = np.copy(rank_argsort)
-		if i < 3: print('rank =', rank_array[i][:20])
-		if i < 3: print('pred =', i, rank_argsort, rank_sort)
-		#if i > 4: break
 	return pred
 	
-def write_results(pred, filename = 'test', task = 1):
-	if task == 1: fout = open('result/' + filename + '.csv', 'w')
+	
+def write_results(pred, filename='test', task=1):
+	if task == 1: 
+		fout = open('result/' + filename + '.csv', 'w')
 	else: 
 		fout = open('result-task2/' + filename + '.csv', 'w') 
 		print('task =', task)
@@ -34,31 +34,27 @@ def write_results(pred, filename = 'test', task = 1):
 	id_userID = pickle.load(handle)
 	for i in range(pred.shape[0]):
 		fout.write(str(id_userID[i]) + ',')
-		for j in range(20): fout.write(str(int(pred[i][j])) + " ")
+		for j in range(20): 
+			fout.write(str(int(pred[i][j])) + " ")
 		fout.write("\n")
 
-def count_highest_food(task = 1):
-	table_array = read_data.build_mf_table(ratio = 0.95) 
+		
+def count_highest_food(task=1):
+	table_array = read_data.build_mf_table(ratio=0.95) 
 	#table_array = read_data.build_mf_table_by_people(ratio = 0.5) # one person at most eat one time
 	rank_array = np.copy(table_array)
-	tmp = np.sum(table_array, axis = 0)
+	tmp = np.sum(table_array, axis=0)
 	print('rank_array =', tmp[:10])
 
-	'''rank_array = -tmp
-	rank_argsort = np.argsort(rank_array)[:50]
-	rank_sort = np.sort(rank_array)[:50]
-	print('pred =', rank_argsort, '\n', rank_sort)
-	exit()'''
-
-	#for i in range(rank_array.shape[0]): rank_array[i] = np.copy(tmp)
 	if task == 1: 
 		pred = output_task1(rank_array, table_array)
 		write_results(pred, 'count_most_(by_people)_remove_eaten')
 	if task == 2:
 		print('task =', task)
 		pred = np.argsort(-rank_array)[:, :20]
-		write_results(pred, 'count_most_(self, by_count)_last95%', task = 2)
+		write_results(pred, 'count_most_(self, by_count)_last95%', task=2)
 
+		
 def compute_from_mf():
 	user_embed = np.load('../all/user_embed_mf.npy')
 	similarity = np.zeros([user_num, user_num]) 
@@ -67,45 +63,28 @@ def compute_from_mf():
 			one_sim = 1 - cosine(user_embed[i],user_embed[j])
 			similarity[i][j] = one_sim
 			similarity[j][i] = one_sim
-		if i % 100 == 0: print(i)
 	return similarity
 
-def select_similar_people(num_people = 100, task = 1):
-	table_array = read_data.build_mf_table_by_people(ratio = 0.0) # one person at most eat one time
+
+def select_similar_people(num_people=100, task=1):
+	table_array = read_data.build_mf_table_by_people(ratio=0.0) # one person at most eat one time
 	similarity = np.zeros([user_num, user_num]) 
 	for i in range(user_num):
 		for j in range(i, user_num):
 			one_sim = 1 - cosine(table_array[i], table_array[j])
 			similarity[i][j] = one_sim
 			similarity[j][i] = one_sim
-		if i % 100 == 0: print(i)
-	#np.save('../all/similarity(people)_cosine', similarity)
-	#similarity = np.load('../all/similarity(people)_cosine.npy')
-	#similarity = compute_from_mf()
 	
 	rank_array = np.zeros(table_array.shape)
 	for i in range(user_num):
 		most_sim = np.argsort(-similarity[i]) # euclidean no need negative sign
 		most_sim_value = np.sort(-similarity[i])
-		#print('most sim =', most_sim[:5], most_sim_value[:5])
 		for j in range(1, 1+num_people):
 			rank_array[i] += similarity[i][most_sim[j]] * table_array[most_sim[j]]
-
-		#rank_array[i] = np.sum(table_array, axis = 0)
-		#print('rank_array =', tmp[:10])
-		#if i > 15: break
-		if i % 500 == 0: print(i)
-	#exit()
 	if task == 1: 
 		pred = output_task1(rank_array, table_array)
-		#write_results(pred, 'sim_mf_weight_first100_cosine')
 		write_results(pred, 'sim_first100_cosine')
-	#if task == 2: # not make sense to use others popularity
-	#	print('task =', task)
-	#	pred = np.argsort(-rank_array)[:, :20]
-	#	write_results(pred, 'count_most_(by_people)_first100_cosine', task = 2)
-	#pred = output_task1(rank_array, table_array) # task = 1
-	#write_results(pred, 'count_most_(by_people)_first100_cosine')
+	
 
 def predict_last_day():
 	handle = open('data/rating_user_time_item', 'rb')
@@ -115,7 +94,7 @@ def predict_last_day():
 food_num = 5532
 user_num = 2608
 def main():
-	#count_highest_food(task = 2) # only use this to reproduce baseline
+	#count_highest_food(task=2) # only use this to reproduce baseline
 	#get_eaten()
 
 	userID_id = read_data.reset_user_id()
@@ -126,6 +105,7 @@ def main():
 if __name__ == '__main__':
 	main()
 
+	
 '''
 table_array =
 [35. 13. 89. 24.  3. 12. 12. 16.  1.  9.]
