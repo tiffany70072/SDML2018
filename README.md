@@ -5,5 +5,5 @@ Special topics on machine learning course (2018 Fall).
 * Task 2: Recommendation system.
 * Task 3: Explainable Seq2Seq model for text generation with control signals.
 * Final project: ICU prediction.
-  * Predict whether each patient may be transfered to in three days.
+  * Use the physiological values of each patient for the previous three days to assist doctors in assessing the need for patients to transfer to the ICU.
   * Use the real dataset provided by the hospital.
