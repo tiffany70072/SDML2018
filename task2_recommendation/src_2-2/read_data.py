@@ -13,7 +13,6 @@ import pandas as pd
 import pickle 
 
 
-
 def read_rating_train(userID_id):
 	# all list: user(array?) - time(not equal) - food(array?)
 	df = pd.read_csv('../all/rating_train.csv')
