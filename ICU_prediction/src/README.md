@@ -13,5 +13,5 @@
 * Length distribution
   * Resample training data
 ----
-* Note: The team has three people, but only provide my code here. 
+* Note: The team has four people, but only provide my code here. 
 * TODO: Upload data_augmentation.py, data_augmentation_perturb.py, d-GRU.py
